@@ -14,7 +14,7 @@
 |  :----:  | :----  |
 | 总结  | 在NeRF中，根据坐标取得图片特征，和坐标特征加到一起获取场景先验。通过NeRF隐藏层特征的加和实现多view融合。 |
 | 优点  | 减少NeRF训练所需view的数量，通过获取图片特征，可以用不同场景图片训练同一个NeRF。属于针对性的优化。 |
-| 疑惑  | 多个场景适配一个NeRF。 <br>  图片特征直接加，完全不需要考虑深度。<br>  这个文章把image作为condition去MLP中检索，是把MLP当作了数据库，同时又当作了一个函数处理图片特征，同时具有了两面性。|
+| 疑惑  | 1. 图片特征直接加，完全不需要考虑深度。<br>  2. 这个文章把image作为condition去MLP中检索，是把MLP当作了数据库，同时又当作了一个函数处理图片特征，同时具有了两面性。<br>3. 在input view的一个像素对应的一条ray上，他们的图片特征是相同的，也就是condition是相同的，那么在f中怎么取得目标RGB和密度？|
 |        |       |
 
 该方法主要贡献分两部分。第一点，如何在NeRF中集成图片特征，第二点，如何将多个view集成到同一个scene中。
@@ -45,4 +45,4 @@
 
 2. 在pixelNeRF中，scene A 包含了一个正方体，scene B 包含了一个正方体和一个球，则模型见过了scene A的两个view，也见过了scene B的两个view，它就具有了对正方体这个概念的prior。在测试时，如果出现了正方体，就可以很好的预测了。
 
-我认为这个方法比较别扭。GRAF是把shape code 和appearance code作为condition 从MLP中取得目标scene，也达成了用一个MLP表示多个scene，减小一个scene 所需的view数量的目的。这个文章把image作为condition去MLP中检索，是把MLP当作了数据库，同时又当作了一个函数处理图片特征，同时具有了两面性。可能是理解不到位。
+我认为这个方法比较别扭。GRAF是把shape code 和appearance code作为condition 从MLP中取得目标scene，也达成了用一个MLP表示多个scene，减小一个scene 所需的view数量的目的。这个文章把image作为condition去MLP中检索，是把MLP当作了数据库，同时又当作了一个函数处理图片特征，同时具有了两面性。<strong>在input view的一个像素对应的一条ray上，他们的图片特征是相同的，也就是condition是相同的，那么在f中怎么取得目标RGB和密度？</strong>
