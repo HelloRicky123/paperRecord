@@ -18,7 +18,7 @@
 
 该方法主要贡献分两部分。第一点，如何在NeRF中集成图片特征，第二点，如何将多个view集成到同一个scene中。
 
-![avatar](./images/singleViewCase.png)
+![avatar](./pixelNeRF/singleViewCase.png)
 
 ### 单个view的流程
 
@@ -30,7 +30,7 @@
 3. 将x,d,W($\pi$(x)) 都使用图中的f处理，得到这一点对应的RGB和密度$\sigma$。f的内部结构如下图所示，只考虑下图中一个分支。
    1. 将x和d升维后和图片特征W相加，经过MLP处理，再次使用残差模块，得到<strong>隐藏层特征</strong>，再使用几层MLP，得到最终的RGB和$\sigma$。
 
-![avatar](./images/fInternel.png)
+![avatar](./pixelNeRF/fInternel.png)
 
 ### 使用多个view共同训练或者测试
 
