@@ -1,8 +1,8 @@
-# NeRF: Representing Scenes as Neural Radiance Fields for View Synthesis@2020ECCV
+# GRAF: Generative Radiance Fields for 3D-Aware Image Synthesis
 
 ## 发布于
 
-2020 ECCV 
+2020 NIPS
 
 ## 任务
 
@@ -10,34 +10,23 @@
 
 ## 方法说明
 
-| 总结  | 多视角拍摄一个场景，使用MLP存储场景信息并不断修正。MLP将（三维坐标，观察角度）map到（颜色，密度），然后在一条ray上累加作为渲染得到的新视角图片。 |
+| 总结  | 相较于NeRF，通过cat加入了shape code 和 appearance code，提高网络的容量。理解为将code作为key 去检索一个更大的数据库。 |
 |  :----:  | :----  |
-| 优点  | 连续表示一个场景。位置编码提高了细节程度。 |
-| 疑惑  | 位置编码起作用的具体原因。 |
+| 优点  | 优点是提高了可控制性。 |
+| 疑惑  | 1. 车和人，不同的车是否是一个模型学习的 <br> 2.appearance code 和 shape code在训练时是否更新，对于真实的车，其code如何确定。|
+| 改进  | 用于人体重建，将动作作为code。根据一张照片判断动作的code，生成其他角度的图片。|
 
-相当于是把MLP当作一个数据库，将一个场景的数据存储在这个数据库中。
+相当于是把MLP当作一个数据库，将多个场景的数据存储在这个数据库中。使用appearance code 和 shape code 去检索这个数据库。
 
-![avatar](./NeRF/overview.png)
+在NeRF基础上主要有两点改进。
 
-如上图，为两条ray求loss的过程。可以分为以下几步：
+1. 在MLP中引入code，用于检索目标scene
+2. 采用GAN模式，判别器的引入提高了合成效果。
 
-1. sample点得到3D坐标和ray方向。在一个view的视图上找到一个像素，根据相机参数确定这个像素对应的ray，在这条ray上采样N个点，对于其中的每个点：
-   1. 确定其3D坐标，ray方向，将5维数据输入到一个MLP中，输出4维数据分别表示该3D点的RGB和密度。密度是用来表示该3D位置场景的可见程度，也可以用作判断是否会遮挡其后的点。
-2. 这样对于一条ray，得到了其上的N个点的空间RGB和密度。再使用下图公式将一条ray上所有点的颜色累加进行渲染，得到的RGB即为这条ray对应的图片上2D坐标的像素值。
-   1. 式中，$T_i$ 表示这个点的被遮挡程度。对于第t个点，由其之前的t-1个点的不透明程度累加得到。$(1-exp(-\sigma_i \delta_i))$ 表示一个点i的不透明程度。$c_i$ 表示这个点的RGB。
-3. 得到每个ray的预测像素值，和gt像素值计算loss。
+如下图，xyz和shape code 结合输出点密度。xyz，shape code， ray 方向， appearance code结合输出点颜色。
 
-![avatar](./NeRF/render.png)
-
-### 重要trick
-
-除了方法本身外，效果比较好的原因很大程度在这两个trick。
-
-![avatar](./NeRF/positionEmbed.png)
-
-1. 如上图，将三维坐标先转化为高纬度。NeRF的解释是这样可以抓住更细节的信息，高维包含更多的细节。
-2. 在ray上采样N个点时，先少采样一些点，粗略算出整条ray哪些区域的密度更大，然后在密度大的区域再精密采样一些点。
+![avatar](./GrAF/codeNetwork.png)
 
 ## 分析与思考
 
-把NeRF理解为一个数据库，一个scene存放在一个数据库中。
+可能用一个模型学习多个scene，可以互相促进效果。
