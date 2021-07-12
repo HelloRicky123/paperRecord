@@ -27,6 +27,12 @@
 
 ![avatar](./GrAF/codeNetwork.png)
 
+训练的时候，每个静态场景的图片都称为一组图片，每组图片都有各自的shape code 和 appearance code。现假设有两组图片，一组为蓝色车(shape_1,appearance_1)，一组为白色椅子(shape_2,appearance_2)。然后这两组图片依次送一张图片用于训练。
+
+假设现在是一张白色椅子的图片，则网络模型输入的shape code 和 appearance code分别为shape_2,appearance_2。shape_2,appearance_2 本身没有意义，是在训练过程中，强迫网络记住，以后见到shape_2,appearance_2就去输出 椅子，白色。
+
+为了辅助理解，举出特例。当同样一个车出现在多组训练数据中时，同样的车分配了不同的 shape code 和 appearance code，此时模型会学习到，将多组shape code映射到同一个车模型。这种多个code 对应于一个输出不会有问题。而有问题的是“一个code对应多个模型”，这种情况会在随机采样为每种模型分配code时的重复造成。
+
 ## 分析与思考
 
 可能用一个模型学习多个scene，可以互相促进效果。
